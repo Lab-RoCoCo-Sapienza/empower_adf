@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultati Esperimenti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .task-button {
+            transition: all 0.3s ease-in-out;
+        }
+        .task-button.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .content-view {
+            display: none;
+        }
+        .content-view.visible {
+            display: block;
+        }
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .plan-table th, .plan-table td {
+            border: 1px solid #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        .plan-table th {
+            background-color: #f1f5f9; /* slate-100 */
+            font-weight: 600;
+        }
+        .plan-content {
+            background-color: #f8fafc; /* slate-50 */
+            border: 1px solid #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9em;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="text-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Risultati Esperimenti</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+        <!-- Vista Tasks -->
+        <div id="tasks-view" class="content-view visible">
+            <section id="navigator">
+                <h3 class="text-lg sm:text-xl font-semibold text-center text-slate-800 mb-6">Seleziona un Task</h3>
+                <div id="task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <!-- I bottoni dei task verranno inseriti qui dinamicamente -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Vista Esperimenti -->
+        <div id="experiments-view" class="content-view">
+            <button id="back-to-tasks" class="mb-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors">
+                &larr; Torna ai Task
+            </button>
+            <h2 id="experiment-title" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-6"></h2>
+            <div id="experiment-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Le card degli esperimenti verranno inserite qui -->
+            </div>
+        </div>
+
+        <!-- Vista Dettagli -->
+        <div id="details-view" class="content-view">
+             <button id="back-to-experiments" class="mb-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors">
+                &larr; Torna agli Esperimenti
+            </button>
+            <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+                <h2 id="details-title" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-6"></h2>
+                <div id="details-content" class="experiment-details"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const allData = [
+    {
+        "task_id": "T1_task_1",
+        "task_name": "use the fire extinguisher to turn off the fire",
+        "experiments": [
+            {
+                "id": "20250702-172350",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the fire extinguisher\n2. GRAB fire extinguisher\n3. NAVIGATE to the fire\n4. ROTATE_LEFT gripper with fire extinguisher\n5. HUMAN activate the fire extinguisher\n6. HUMAN sweep nozzle at the base of the fire until extinguished",
+                    "awareness": "<PLAN>\nThere are no actions to be performed at this moment since there is no fire to use the fire extinguisher on.\n</PLAN>"
+                },
+                "task_name": "use the fire extinguisher to turn off the fire",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-172539",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the fire extinguisher\n2. GRAB fire extinguisher\n3. HUMAN {remove the safety pin from the fire extinguisher}\n4. HUMAN {aim the nozzle at the base of the fire}\n5. HUMAN {squeeze the handle to release the extinguishing agent}\n6. HUMAN {sweep side to side until the fire is fully extinguished}",
+                    "awareness": "GRAB fire extinguisher  \nHUMAN {use the fire extinguisher for me}  "
+                },
+                "task_name": "use the fire extinguisher",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-172747",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the fire extinguisher\n2. GRAB fire extinguisher\n3. ROTATE_LEFT gripper with fire extinguisher\n4. HUMAN {remove the safety pin from the fire extinguisher}\n5. ROTATE_RIGHT gripper with fire extinguisher\n6. HUMAN {aim the nozzle at the base of the fire}\n7. HUMAN {squeeze the handle to release the extinguishing agent}\n8. HUMAN {sweep side to side with the nozzle until the fire is extinguished}\n9. HUMAN {monitor the area for any signs of re-ignition}",
+                    "awareness": "GRAB fire extinguisher  \nHUMAN {operate the fire extinguisher for me}  "
+                },
+                "task_name": "use the fire extinguisher",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-172912",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the fire extinguisher\n2. GRAB fire extinguisher\n3. ROTATE_RIGHT gripper with fire extinguisher\n4. HUMAN {pull the pin at the top of the fire extinguisher}\n5. HUMAN {aim the nozzle at the base of the fire}\n6. HUMAN {squeeze the handle to release the extinguishing agent}",
+                    "awareness": "HUMAN approach the fire extinguisher  \nHUMAN pick up the fire extinguisher  \nHUMAN use the fire extinguisher as necessary  "
+                },
+                "task_name": "use the fire extinguisher",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            }
+        ]
+    },
+    {
+        "task_id": "T1_task_2",
+        "task_name": "lift the table",
+        "experiments": [
+            {
+                "id": "20250702-153952",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table\n2. GRAB toolbox\n3. DROP toolbox left to table\n4. GRAB bottle\n5. DROP bottle center to table\n6. GRAB cup\n7. DROP cup left to bottle\n8. GRAB speaker\n9. DROP speaker right to cup\n10. GRAB table\n11. HUMAN {lift the table for me}",
+                    "awareness": "NAVIGATE to the toolbox  \nGRAB toolbox  \nDROP toolbox on table  \nNAVIGATE to water bottle  \nGRAB water bottle  \nDROP water bottle on table  \nNAVIGATE to white cup  \nGRAB white cup  \nDROP white cup in front of water bottle  \nNAVIGATE to white cup 2  \nGRAB white cup 2  \nDROP white cup 2 right to white cup  \nNAVIGATE to speaker  \nGRAB speaker  \nDROP speaker right to water bottle  "
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-154555",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table\n2. GRAB yellow toolbox\n3. DROP yellow toolbox left to the table\n4. GRAB water bottle\n5. DROP water bottle right to the table\n6. GRAB small white cup (left)\n7. DROP small white cup into safe location\n8. GRAB small white cup (right)\n9. DROP small white cup into safe location\n10. GRAB gray cylindrical speaker\n11. DROP gray cylindrical speaker right to the water bottle\n12. NAVIGATE to the front of the table\n13. GRAB table\n14. LIFT table",
+                    "awareness": "<PLAN>\n\nNo actions to perform.\n\n</PLAN>"
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-154714",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table  \n2. GRAB yellow toolbox  \n3. DROP yellow toolbox left to table  \n4. GRAB water bottle  \n5. DROP water bottle right to table  \n6. GRAB white cup  \n7. DROP white cup in front of water bottle  \n8. GRAB cylindrical speaker  \n9. DROP cylindrical speaker right to water bottle  \n10. GRAB table  \n11. LIFT table  ",
+                    "awareness": "NAVIGATE to the table"
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-155012",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table\n2. GRAB yellow toolbox\n3. DROP yellow toolbox left to the table\n4. GRAB water bottle\n5. DROP water bottle left to the table\n6. GRAB white cup 1\n7. DROP white cup 1 right to the water bottle\n8. GRAB white cup 2\n9. DROP white cup 2 right to white cup 1\n10. GRAB cylindrical speaker\n11. DROP cylindrical speaker right to white cup 2\n12. NAVIGATE to front of the table\n13. GRAB table\n14. LIFT table",
+                    "awareness": "I will not be able to assist with that request."
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-155140",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table  \n2. GRAB yellow toolbox  \n3. DROP yellow toolbox left to the table  \n4. GRAB water bottle  \n5. DROP water bottle center to the table  \n6. GRAB white cup (left)  \n7. DROP white cup left to water bottle  \n8. GRAB white cup (right)  \n9. DROP white cup right to water bottle  \n10. GRAB gray device  \n11. DROP gray device right to the table  \n12. NAVIGATE to the front of the table  \n13. GRAB table  \n14. LIFT table",
+                    "awareness": "<PLAN>\nHUMAN {lift the table for me}\n</PLAN>"
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-155302",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the table\n2. GRAB yellow toolbox\n3. DROP yellow toolbox left to water bottle\n4. GRAB water bottle\n5. DROP water bottle left to first cup\n6. GRAB first cup\n7. DROP first cup right to second cup\n8. GRAB second cup\n9. DROP second cup right to small cylindrical speaker\n10. GRAB small cylindrical speaker\n11. DROP small cylindrical speaker right to table\n12. NAVIGATE to side of the table\n13. GRAB table\n14. LIFT table (HUMAN assist with lifting if needed)",
+                    "awareness": "Thank you for the conversation!"
+                },
+                "task_name": "lift the table",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            }
+        ]
+    },
+    {
+        "task_id": "T1_task_3",
+        "task_name": "detach the TV from the wall",
+        "experiments": [
+            {
+                "id": "20250702-155704",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the television\n2. HUMAN {perform a visual inspection for the mounting mechanism}\n3. HUMAN {remove screws or release the bracket}\n4. HUMAN {support the television}\n5. HUMAN {gently pull away the television from the wall}\n6. HUMAN {place the television on a stable surface}",
+                    "awareness": "HUMAN {assist in detaching the TV from the wall}"
+                },
+                "task_name": "detach the TV from the wall",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-155911",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the television\n2. GRAB screwdriver\n3. HUMAN remove screws from the television\n4. HUMAN support the television\n5. HUMAN detach the television from the wall\n6. DROP television on the table",
+                    "awareness": "<PLAN>\n\nHUMAN {do this action for me}\n\n</PLAN>"
+                },
+                "task_name": "detach the TV from the wall",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-160125",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the humanoid robot\n2. GRAB humanoid robot\n3. DROP humanoid robot behind the chair\n4. NAVIGATE to the water bottle\n5. GRAB water bottle\n6. DROP water bottle left to the white container\n7. NAVIGATE to the white container\n8. GRAB white container\n9. DROP white container left to the table\n10. NAVIGATE to the television\n11. HUMAN {examine the back of the television for mounting brackets or screws}\n12. HUMAN {use a screwdriver to remove any screws securing the television to the wall}\n13. HUMAN {support the television}\n14. HUMAN {detach the television from the mounting brackets and lower it to the floor}\n15. HUMAN {disconnect any cables connected to the television}",
+                    "awareness": "<PLAN>\nThere are no actions to perform as the human has declined assistance with the TV, and does not need help with any other tasks.\n</PLAN>"
+                },
+                "task_name": "detach the TV from the wall",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-160309",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the yellow toolbox\n2. GRAB toolbox\n3. DROP toolbox right to the robot\n4. NAVIGATE to the water bottle\n5. GRAB bottle\n6. DROP bottle left to the robot\n7. NAVIGATE to the banner\n8. NAVIGATE to the television\n9. HUMAN {remove screws or assist to lift the television from brackets}\n10. DROP television on the floor in front of the robot",
+                    "awareness": "HUMAN detach the TV from the wall"
+                },
+                "task_name": "detach the TV from the wall",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-160424",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to under the television  \n2. GRAB screwdriver  \n3. ROTATE_RIGHT gripper with screwdriver  \n4. HUMAN {remove screws from the back of the television}  \n5. NAVIGATE to support the television  \n6. HUMAN {hold the television}  \n7. HUMAN {remove final screws from the back of the television}  \n8. NAVIGATE to place the television down  \n9. DROP television on stable surface  ",
+                    "awareness": "HUMAN {detach the TV from the wall}"
+                },
+                "task_name": "detach the TV from the wall",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            }
+        ]
+    },
+    {
+        "task_id": "T1_task_4",
+        "task_name": "Exit climbing the stairs",
+        "experiments": [
+            {
+                "id": "20250702-171118",
+                "plan": {
+                    "no_awareness": "NAVIGATE to the staircase  \nCLIMB the staircase  \nHUMAN help me climb the staircase  ",
+                    "awareness": "HUMAN {assist me in climbing the stairs}"
+                },
+                "task_name": "Exit climbing the stairs",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-171340",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the metal staircase\n2. CLIMB\n3. CLIMB\n4. CLIMB\n5. CLIMB\n6. CLIMB\n7. CLIMB\n8. CLIMB\n9. CLIMB\n10. CLIMB",
+                    "awareness": "There are no actions to perform at the moment based on the conversation and the provided constraints."
+                },
+                "task_name": "Exit climbing the stairs",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-171527",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the tiled floor under the metal staircase\n2. NAVIGATE to the first step of the metal staircase\n3. HUMAN {climb the stairs while using the railing for support}",
+                    "awareness": "No actions to execute. Awaiting further instructions."
+                },
+                "task_name": "Exit climbing the stairs",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-171655",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the metal staircase  \n2. CLIMB up the staircase  \n3. NAVIGATE to the top of the staircase  \n4. EXIT to the open area",
+                    "awareness": "No specific actions to perform, as the person is climbing the stairs on their own."
+                },
+                "task_name": "Exit climbing the stairs",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            },
+            {
+                "id": "20250702-171736",
+                "plan": {
+                    "no_awareness": "1. NAVIGATE to the staircase\n2. NAVIGATE to the first step of the staircase\n3. NAVIGATE to the top of the staircase",
+                    "awareness": "HUMAN {provide assistance to navigate the staircase}"
+                },
+                "task_name": "Exit climbing the stairs",
+                "image": "image.png",
+                "overlay": "overlay.jpg"
+            }
+        ]
+    }
+];
+
+        const tasksView = document.getElementById('tasks-view');
+        const experimentsView = document.getElementById('experiments-view');
+        const detailsView = document.getElementById('details-view');
+
+        const backToTasksButton = document.getElementById('back-to-tasks');
+        const backToExperimentsButton = document.getElementById('back-to-experiments');
+
+        let currentTask = null;
+
+        // La funzione fetchData() viene rimossa.
+        // I dati vengono ora letti dalla variabile 'allData' iniettata dallo script Python.
+        if (typeof allData !== 'undefined') {
+            displayTasks(allData);
+        } else {
+            console.error("Dati non trovati. Esegui lo script generate_static_site.py per generare il sito.");
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = `<p class="text-center text-red-500">Errore: Dati non trovati. Esegui lo script di generazione prima di aprire questo file.</p>`;
+        }
+
+        function displayTasks(data) {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            data.forEach(task => {
+                const button = document.createElement('button');
+                button.className = 'task-button p-6 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500';
+                button.innerHTML = `
+                    <div class="flex flex-col items-center text-center">
+                        <div class="p-3 bg-sky-100 rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg text-slate-800">${task.task_name}</h4>
+                        <p class="text-sm text-slate-500 mt-1">${task.experiments.length} esperimenti</p>
+                    </div>
+                `;
+                button.onclick = () => showExperiments(task);
+                taskList.appendChild(button);
+            });
+        }
+
+        function showExperiments(task) {
+            currentTask = task;
+            tasksView.classList.remove('visible');
+            detailsView.classList.remove('visible');
+            experimentsView.classList.add('visible');
+            
+            document.getElementById('experiment-title').innerText = `Esperimenti per: ${task.task_name}`;
+            const experimentList = document.getElementById('experiment-list');
+            experimentList.innerHTML = '';
+            task.experiments.forEach(exp => {
+                const card = document.createElement('div');
+                card.className = 'p-6 bg-white rounded-lg shadow-md hover:shadow-xl cursor-pointer transition-shadow';
+                card.innerHTML = `<h3 class="font-semibold text-md text-slate-800">${exp.id}</h3>`;
+                card.onclick = () => showDetails(task.task_id, exp);
+                experimentList.appendChild(card);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showDetails(taskId, experiment) {
+            experimentsView.classList.remove('visible');
+            detailsView.classList.add('visible');
+
+            document.getElementById('details-title').innerText = `Dettagli: ${experiment.id}`;
+            const detailsContent = document.getElementById('details-content');
+            
+            let imagesHTML = '<h3 class="text-xl font-bold text-sky-700 mb-4">Immagini</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">';
+            if (experiment.image) {
+                imagesHTML += `<div><h4 class="font-semibold text-slate-800 mb-2">Immagine Originale</h4><img src="${taskId}/${experiment.id}/${experiment.image}" alt="Original Image" class="rounded-lg shadow-md w-full"></div>`;
+            }
+            if (experiment.overlay) {
+                imagesHTML += `<div><h4 class="font-semibold text-slate-800 mb-2">Overlay</h4><img src="${taskId}/${experiment.id}/${experiment.overlay}" alt="Overlay Image" class="rounded-lg shadow-md w-full"></div>`;
+            }
+            imagesHTML += '</div>';
+
+            let plansHTML = '<h3 class="text-xl font-bold text-sky-700 mb-4">Piani Generati</h3>';
+            if (experiment.plan && (experiment.plan.no_awareness || experiment.plan.awareness)) {
+                plansHTML += `
+                    <div class="overflow-x-auto">
+                        <table class="plan-table">
+                            <thead>
+                                <tr>
+                                    <th>No Awareness</th>
+                                    <th>Awareness</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><pre class="plan-content">${experiment.plan.no_awareness || 'N/A'}</pre></td>
+                                    <td><pre class="plan-content">${experiment.plan.awareness || 'N/A'}</pre></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            } else {
+                plansHTML += '<p class="text-slate-500">Nessun piano trovato per questo esperimento.</p>';
+            }
+
+            detailsContent.innerHTML = imagesHTML + plansHTML;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        backToTasksButton.onclick = () => {
+            experimentsView.classList.remove('visible');
+            tasksView.classList.add('visible');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        backToExperimentsButton.onclick = () => {
+            detailsView.classList.remove('visible');
+            experimentsView.classList.add('visible');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+</body>
+</html>
