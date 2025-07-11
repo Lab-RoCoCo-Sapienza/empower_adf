@@ -319,15 +319,7 @@
                 experiment.conversation.forEach((step, index) => {
                     const stepId = `step-${experiment.id}-${index}`;
                     
-                    // Human message
-                    conversationHTML += `
-                        <div class="chat-message human">
-                            <div class="message-bubble human">
-                                ${step.HUMAN_question}
-                            </div>
-                            <div class="avatar human">H</div>
-                        </div>
-                    `;
+                    
                     
                     // LLM message
                     conversationHTML += `
@@ -337,6 +329,14 @@
                                 ${step.LLM_question}
                                 ${step.reasoning_step ? '<div class="click-hint">Click to see reasoning</div>' : ''}
                             </div>
+                        </div>
+                    `;// Human message
+                    conversationHTML += `
+                        <div class="chat-message human">
+                            <div class="message-bubble human">
+                                ${step.HUMAN_question}
+                            </div>
+                            <div class="avatar human">H</div>
                         </div>
                     `;
                     
