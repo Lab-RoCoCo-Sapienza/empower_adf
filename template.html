@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .task-button {
+            transition: all 0.3s ease-in-out;
+        }
+        .task-button.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .content-view {
+            display: none;
+        }
+        .content-view.visible {
+            display: block;
+        }
+        .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .plan-table th, .plan-table td {
+            border: 1px solid #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            text-align: left;
+            vertical-align: top;
+            width: 50%;
+        }
+        .plan-table th {
+            background-color: #f1f5f9; /* slate-100 */
+            font-weight: 600;
+        }
+        .plan-content {
+            background-color: #f8fafc; /* slate-50 */
+            border: 1px solid #e2e8f0; /* slate-200 */
+            padding: 1rem;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.9em;
+            border-radius: 0.5rem;
+        }
+        .conversation-step {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        .conversation-step:hover {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .reasoning-content {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            white-space: pre-wrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            border-radius: 0.5rem;
+            line-height: 1.6;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .chat-message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        .chat-message.human {
+            justify-content: flex-end;
+        }
+        .chat-message.llm {
+            justify-content: flex-start;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 1rem 1.25rem;
+            border-radius: 1.5rem;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .message-bubble.human {
+            background-color: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 0.375rem;
+        }
+        .message-bubble.llm {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            border-bottom-left-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .message-bubble.llm:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+            margin: 0 0.75rem;
+            flex-shrink: 0;
+        }
+        .avatar.human {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .avatar.llm {
+            background-color: #10b981;
+            color: white;
+        }
+        .reasoning-panel {
+            display: none;
+            margin-top: 0.75rem;
+            margin-left: 44px;
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            animation: slideDown 0.3s ease-out;
+        }
+        .reasoning-panel.visible {
+            display: block;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .click-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="text-center">
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Experiment Results</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+        <!-- Tasks View -->
+        <div id="tasks-view" class="content-view visible">
+            <section id="navigator">
+                <h3 class="text-lg sm:text-xl font-semibold text-center text-slate-800 mb-6">Select a Task</h3>
+                <div id="task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <!-- Task buttons will be inserted here dynamically -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Experiments View -->
+        <div id="experiments-view" class="content-view">
+            <button id="back-to-tasks" class="mb-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors">
+                &larr; Back to Tasks
+            </button>
+            <h2 id="experiment-title" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-6"></h2>
+            <div id="experiment-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Experiment cards will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Details View -->
+        <div id="details-view" class="content-view">
+             <button id="back-to-experiments" class="mb-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition-colors">
+                &larr; Back to Experiments
+            </button>
+            <div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+                <h2 id="details-title" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-6"></h2>
+                <div id="details-content" class="experiment-details"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /*__DATA_PLACEHOLDER__*/
+
+        const tasksView = document.getElementById('tasks-view');
+        const experimentsView = document.getElementById('experiments-view');
+        const detailsView = document.getElementById('details-view');
+
+        const backToTasksButton = document.getElementById('back-to-tasks');
+        const backToExperimentsButton = document.getElementById('back-to-experiments');
+
+        let currentTask = null;
+
+        // The fetchData() function is removed.
+        // Data is now read from the 'allData' variable injected by the Python script.
+        if (typeof allData !== 'undefined') {
+            displayTasks(allData);
+        } else {
+            console.error("Data not found. Run the generate_static_site.py script to generate the site.");
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = `<p class="text-center text-red-500">Error: Data not found. Run the generation script before opening this file.</p>`;
+        }
+
+        function displayTasks(data) {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            data.forEach(task => {
+                const button = document.createElement('button');
+                button.className = 'task-button p-6 bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500';
+                button.innerHTML = `
+                    <div class="flex flex-col items-center text-center">
+                        <div class="p-3 bg-sky-100 rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg text-slate-800">${task.task_name}</h4>
+                        <p class="text-sm text-slate-500 mt-1">${task.experiments.length} experiments</p>
+                    </div>
+                `;
+                console.log(task.task_name)
+                button.onclick = () => showExperiments(task);
+                taskList.appendChild(button);
+            });
+        }
+
+        function showExperiments(task) {
+            currentTask = task;
+            tasksView.classList.remove('visible');
+            detailsView.classList.remove('visible');
+            experimentsView.classList.add('visible');
+            
+            document.getElementById('experiment-title').innerText = `Experiments for: ${task.task_name}`;
+            const experimentList = document.getElementById('experiment-list');
+            experimentList.innerHTML = '';
+            task.experiments.forEach(exp => {
+                const card = document.createElement('div');
+                card.className = 'p-6 bg-white rounded-lg shadow-md hover:shadow-xl cursor-pointer transition-shadow';
+                card.innerHTML = `<h3 class="font-semibold text-md text-slate-800">${exp.id}</h3>`;
+                card.onclick = () => showDetails(task.task_id, exp);
+                experimentList.appendChild(card);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showDetails(taskId, experiment) {
+            experimentsView.classList.remove('visible');
+            detailsView.classList.add('visible');
+
+            document.getElementById('details-title').innerText = `Details: ${experiment.id}`;
+            const detailsContent = document.getElementById('details-content');
+            
+            let imagesHTML = '<h3 class="text-xl font-bold text-sky-700 mb-4">Images</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">';
+            if (experiment.image) {
+                imagesHTML += `<div><h4 class="font-semibold text-slate-800 mb-2">Original Image</h4><img src="${taskId}/${experiment.id}/${experiment.image}" alt="Original Image" class="rounded-lg shadow-md w-full"></div>`;
+            }
+            if (experiment.overlay) {
+                imagesHTML += `<div><h4 class="font-semibold text-slate-800 mb-2">Overlay</h4><img src="${taskId}/${experiment.id}/${experiment.overlay}" alt="Overlay Image" class="rounded-lg shadow-md w-full"></div>`;
+            }
+            imagesHTML += '</div>';
+
+            let plansHTML = '<h3 class="text-xl font-bold text-sky-700 mb-4">Generated Plans</h3>';
+            if (experiment.plan && (experiment.plan.no_awareness || experiment.plan.awareness)) {
+                plansHTML += `
+                    <div class="overflow-x-auto mb-8">
+                        <table class="plan-table">
+                            <thead>
+                                <tr>
+                                    <th>No Awareness</th>
+                                    <th>Awareness</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><pre class="plan-content">${experiment.plan.no_awareness || 'N/A'}</pre></td>
+                                    <td><pre class="plan-content">${experiment.plan.awareness || 'N/A'}</pre></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>`;
+            } else {
+                plansHTML += '<p class="text-slate-500 mb-8">No plans found for this experiment.</p>';
+            }
+
+            let conversationHTML = '<h3 class="text-xl font-bold text-sky-700 mb-4">Conversation</h3>';
+            if (experiment.conversation && experiment.conversation.length > 0) {
+                conversationHTML += '<div class="chat-container">';
+                experiment.conversation.forEach((step, index) => {
+                    const stepId = `step-${experiment.id}-${index}`;
+                    
+                    // Human message
+                    conversationHTML += `
+                        <div class="chat-message human">
+                            <div class="message-bubble human">
+                                ${step.HUMAN_question}
+                            </div>
+                            <div class="avatar human">H</div>
+                        </div>
+                    `;
+                    
+                    // LLM message
+                    conversationHTML += `
+                        <div class="chat-message llm">
+                            <div class="avatar llm">AI</div>
+                            <div class="message-bubble llm" onclick="toggleReasoning('${stepId}')">
+                                ${step.LLM_question}
+                                ${step.reasoning_step ? '<div class="click-hint">Click to see reasoning</div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Reasoning panel (hidden by default)
+                    if (step.reasoning_step) {
+                        conversationHTML += `
+                            <div class="reasoning-panel" id="reasoning-${stepId}">
+                                <div class="flex items-center mb-2">
+                                    <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                    </svg>
+                                    <h5 class="font-semibold text-amber-800">AI Reasoning Process</h5>
+                                </div>
+                                <div class="reasoning-content text-sm">${step.reasoning_step}</div>
+                            </div>
+                        `;
+                    }
+                });
+                conversationHTML += '</div>';
+            } else {
+                conversationHTML += '<p class="text-slate-500">No conversation found for this experiment.</p>';
+            }
+
+            detailsContent.innerHTML = imagesHTML + plansHTML + conversationHTML;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleReasoning(stepId) {
+            const reasoningPanel = document.getElementById(`reasoning-${stepId}`);
+            if (reasoningPanel) {
+                reasoningPanel.classList.toggle('visible');
+            }
+        }
+
+        backToTasksButton.onclick = () => {
+            experimentsView.classList.remove('visible');
+            tasksView.classList.add('visible');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        backToExperimentsButton.onclick = () => {
+            detailsView.classList.remove('visible');
+            experimentsView.classList.add('visible');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+</body>
+</html>
