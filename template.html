@@ -354,8 +354,16 @@
                             </div>
                         `;
                     }
-                });
-                conversationHTML += '</div>';
+                }
+            );              conversationHTML += `
+                    <div class="chat-message llm">
+                        <div class="avatar llm">AI</div>
+                        <div class="message-bubble llm">
+                            No further questions.     
+                        </div>
+                    </div>`;
+
+  
             } else {
                 conversationHTML += '<p class="text-slate-500">No conversation found for this experiment.</p>';
             }
